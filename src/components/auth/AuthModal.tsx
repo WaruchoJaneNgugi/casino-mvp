@@ -80,11 +80,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                             Phone
                         </label>
                         <input
-                            type="phone"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
+                            type="tel" // Changed from email to tel
+                            value={phone} // Changed from email to phone
+                            onChange={(e) => setPhone(e.target.value)} // Changed from setEmail to setPhone
                             className="w-full bg-stake-gray border border-stake-border rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-stake-orange focus:glow-orange transition-all"
-                            placeholder="Enter your phone"
+                            placeholder="Enter your phone number"
                             required
                         />
                     </div>

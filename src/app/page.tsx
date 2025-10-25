@@ -69,15 +69,15 @@ export default function Home() {
         setCurrentGame('home');
     };
 
-    const handleAuth = (email: string, password: string, name?: string) => {
+    // In your main page, update the handleAuth function:
+    const handleAuth = (phone: string, password: string, name?: string) => { // Changed from email to phone
         if (authMode === 'login') {
-            login(email, password);
+            login(phone, password); // Pass phone instead of email
         } else {
-            register(email, password, name || email.split('@')[0]);
+            register(phone, password, name || `User${phone.slice(-4)}`); // Pass phone instead of email
         }
         setAuthModalOpen(false);
     };
-
     const handleDeposit = (amount: number) => {
         if (user.isLoggedIn) {
             deposit(amount);

@@ -4,10 +4,10 @@ import { GameState, Player, User } from '@/types';
 export const useGameState = (initialBalance: number = 1000) => {
     const [user, setUser] = useState<User>({
         id: '',
-        email: '',
+        phone: '', // Changed from email to phone
         name: '',
         isLoggedIn: false,
-        balance: 0, // Add balance to user
+        balance: 0,
     });
 
     const [gameState, setGameState] = useState<GameState>({
@@ -25,19 +25,19 @@ export const useGameState = (initialBalance: number = 1000) => {
         totalLosses: 0,
     });
 
-    const login = useCallback((email: string, password: string) => {
+    const login = useCallback((phone: string, password: string) => { // Changed parameter from email to phone
         // Simulate login - in real app, this would be an API call
         setUser({
             id: '1',
-            email,
-            name: email.split('@')[0],
+            phone, // Use phone instead of email
+            name: `User${phone.slice(-4)}`, // Generate name from phone last 4 digits
             isLoggedIn: true,
-            balance: initialBalance, // Set balance for user
+            balance: initialBalance,
         });
         setPlayer(prev => ({
             ...prev,
             balance: initialBalance,
-            name: email.split('@')[0],
+            name: `User${phone.slice(-4)}`, // Generate name from phone last 4 digits
         }));
         setGameState(prev => ({
             ...prev,
@@ -45,14 +45,14 @@ export const useGameState = (initialBalance: number = 1000) => {
         }));
     }, [initialBalance]);
 
-    const register = useCallback((email: string, password: string, name: string) => {
+    const register = useCallback((phone: string, password: string, name: string) => { // Changed parameter from email to phone
         // Simulate registration
         setUser({
             id: '1',
-            email,
+            phone, // Use phone instead of email
             name,
             isLoggedIn: true,
-            balance: initialBalance, // Set balance for user
+            balance: initialBalance,
         });
         setPlayer(prev => ({
             ...prev,
@@ -68,10 +68,10 @@ export const useGameState = (initialBalance: number = 1000) => {
     const logout = useCallback(() => {
         setUser({
             id: '',
-            email: '',
+            phone: '', // Reset phone instead of email
             name: '',
             isLoggedIn: false,
-            balance: 0, // Reset balance for user
+            balance: 0,
         });
         setPlayer(prev => ({
             ...prev,
