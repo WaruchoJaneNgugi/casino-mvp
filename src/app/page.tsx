@@ -172,32 +172,32 @@ export default function Home() {
                                 {/* Left Column - Games List */}
                                 <div className="xl:col-span-3 space-y-8">
                                     {/* Welcome Section for Guests */}
-                                    {!user.isLoggedIn && (
-                                        <section className="gradient-orange rounded-2xl p-8 text-center glow-orange">
-                                            <h2 className="text-3xl font-bold text-white mb-4">🎲 Welcome to JW Gaming</h2>
-                                            {/*<p className="text-white/90 text-lg mb-6">Join now and get $1,000 bonus to start playing!</p>*/}
-                                            <div className="flex gap-4 justify-center">
-                                                <button
-                                                    onClick={() => {
-                                                        setAuthMode('login');
-                                                        setAuthModalOpen(true);
-                                                    }}
-                                                    className="bg-white text-orange-600 px-8 py-3 rounded-xl font-bold hover:bg-gray-100 transition-colors"
-                                                >
-                                                    Sign In
-                                                </button>
-                                                <button
-                                                    onClick={() => {
-                                                        setAuthMode('register');
-                                                        setAuthModalOpen(true);
-                                                    }}
-                                                    className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-xl font-bold hover:bg-white hover:text-orange-600 transition-colors"
-                                                >
-                                                    Register
-                                                </button>
-                                            </div>
-                                        </section>
-                                    )}
+                                    {/*{!user.isLoggedIn && (*/}
+                                    {/*    <section className="gradient-orange rounded-2xl p-8 text-center glow-orange">*/}
+                                    {/*        <h2 className="text-3xl font-bold text-white mb-4">🎲 Welcome to JW Gaming</h2>*/}
+                                    {/*        /!*<p className="text-white/90 text-lg mb-6">Join now and get $1,000 bonus to start playing!</p>*!/*/}
+                                    {/*        <div className="flex gap-4 justify-center">*/}
+                                    {/*            <button*/}
+                                    {/*                onClick={() => {*/}
+                                    {/*                    setAuthMode('login');*/}
+                                    {/*                    setAuthModalOpen(true);*/}
+                                    {/*                }}*/}
+                                    {/*                className="bg-white text-orange-600 px-8 py-3 rounded-xl font-bold hover:bg-gray-100 transition-colors"*/}
+                                    {/*            >*/}
+                                    {/*                Sign In*/}
+                                    {/*            </button>*/}
+                                    {/*            <button*/}
+                                    {/*                onClick={() => {*/}
+                                    {/*                    setAuthMode('register');*/}
+                                    {/*                    setAuthModalOpen(true);*/}
+                                    {/*                }}*/}
+                                    {/*                className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-xl font-bold hover:bg-white hover:text-orange-600 transition-colors"*/}
+                                    {/*            >*/}
+                                    {/*                Register*/}
+                                    {/*            </button>*/}
+                                    {/*        </div>*/}
+                                    {/*    </section>*/}
+                                    {/*)}*/}
 
                                     {/* Game Tabs Section - Replaces individual game sections */}
                                     <section className="bg-stake-gray/50 rounded-2xl p-6 border border-stake-border backdrop-blur-sm">
