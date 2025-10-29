@@ -7,15 +7,15 @@ interface GameTabsProps {
 }
 
 export const GameTabs: React.FC<GameTabsProps> = ({ onGameSelect, userLoggedIn }) => {
-    const [activeTab, setActiveTab] = useState('slots');
+    const [activeTab, setActiveTab] = useState('originals');
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     const categories = [
+        { id: 'originals', name: 'Originals', icon: '⭐' },
         { id: 'slots', name: 'Slots', icon: '🎰' },
         { id: 'jackpots', name: 'Jackpots', icon: '💰' },
         { id: 'spins', name: 'Spins', icon: '🎯' },
         { id: 'roulettes', name: 'Roulettes', icon: '🎡' },
-        { id: 'originals', name: 'Originals', icon: '⭐' },
     ];
 
     const originalsGames = [
@@ -185,14 +185,14 @@ export const GameTabs: React.FC<GameTabsProps> = ({ onGameSelect, userLoggedIn }
                 <div className="flex items-center justify-between mb-4">
                     <div className="min-w-0 flex-1"> {/* Added to prevent text overflow */}
                         <h3 className="text-xl font-bold text-white capitalize truncate">
-                            {activeTab === 'originals' ? 'Stake Originals' : activeTab}
+                            {activeTab === 'originals' ? 'JW Originals' : activeTab}
                         </h3>
                         <p className="text-stake-light-gray text-sm truncate">
                             {activeTab === 'slots' && 'Spin and win big jackpots'}
                             {activeTab === 'jackpots' && 'Massive progressive jackpots'}
                             {activeTab === 'spins' && 'Quick spin games'}
                             {activeTab === 'roulettes' && 'Classic roulette variations'}
-                            {activeTab === 'originals' && 'Exclusive Stake games'}
+                            {activeTab === 'originals' && 'Exclusive JW games'}
                         </p>
                     </div>
                     <div className="flex items-center space-x-2 flex-shrink-0 ml-2">

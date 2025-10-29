@@ -28,6 +28,12 @@ export const gameImages = {
         slot4: '/images/games/slots/slots.png',
         slot5: '/images/games/slots/slots.png',
         slot6: '/images/games/slots/slots.png',
+        slot7: '/images/games/slots/slots.png',
+        slot8: '/images/games/slots/slots.png',
+        slot9: '/images/games/slots/slots.png',
+        slot10: '/images/games/slots/slots.png',
+        slot11: '/images/games/slots/slots.png',
+        slot12: '/images/games/slots/slots.png',
     },
     roulettes: {
         roulette1: '/images/games/roulettes/roulette1.png',

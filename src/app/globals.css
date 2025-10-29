@@ -184,6 +184,16 @@ body {
     }
 }
 
+.main-entry-div{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.main-cont{
+    display: flex;
+    width: 100%;
+    max-width: 3000px;
+}
 /* Smooth image loading */
 .banner-loading {
     background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
