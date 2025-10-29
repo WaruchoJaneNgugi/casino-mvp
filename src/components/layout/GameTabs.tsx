@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import {getGamesByCategory} from "@/utils/imageutils";
+import React, { useState, useRef, useMemo } from 'react';
+import { getGamesByCategory } from "@/utils/imageutils";
 
 interface GameTabsProps {
     onGameSelect: (gameId: string, category: string, gameNumber?: number) => void;
@@ -8,6 +8,7 @@ interface GameTabsProps {
 
 export const GameTabs: React.FC<GameTabsProps> = ({ onGameSelect, userLoggedIn }) => {
     const [activeTab, setActiveTab] = useState('originals');
+    const [searchQuery, setSearchQuery] = useState('');
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     const categories = [
@@ -27,12 +28,38 @@ export const GameTabs: React.FC<GameTabsProps> = ({ onGameSelect, userLoggedIn }
         { id: 'roulette', name: 'Roulette', image: '/images/games/roulette.png', players: '2,118' },
     ];
 
+    // Filter games based on search query
+    const filteredOriginalsGames = useMemo(() => {
+        if (!searchQuery.trim()) return originalsGames;
+
+        return originalsGames.filter(game =>
+            game.name.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+    }, [searchQuery]);
+
+    const filteredCategoryGames = useMemo(() => {
+        const games = getGamesByCategory(activeTab);
+        if (!searchQuery.trim()) return games;
+
+        return games.filter(game =>
+            game.name.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+    }, [activeTab, searchQuery]);
+
     const handleGameClick = (gameId: string, category: string, gameNumber?: number) => {
         if (!userLoggedIn) {
             alert('Please login to play games!');
             return;
         }
         onGameSelect(gameId, category, gameNumber);
+    };
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value);
+    };
+
+    const clearSearch = () => {
+        setSearchQuery('');
     };
 
     // Scroll functions for mobile
@@ -51,104 +78,138 @@ export const GameTabs: React.FC<GameTabsProps> = ({ onGameSelect, userLoggedIn }
     const renderGames = () => {
         if (activeTab === 'originals') {
             return (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                    {originalsGames.map((game) => (
-                        <div
-                            key={game.id}
-                            onClick={() => handleGameClick(game.id, 'originals')}
-                            className="group cursor-pointer transform hover:scale-105 transition-all duration-300"
-                        >
-                            <div className="bg-gradient-to-br from-orange-500 to-amber-500 rounded-2xl p-1 glow-orange group-hover:glow-gold transition-all duration-300">
-                                <div className="bg-stake-dark rounded-xl p-3 text-center">
-                                    <div className="aspect-video rounded-lg mb-2 flex items-center justify-center relative overflow-hidden">
-                                        <img
-                                            src={game.image}
-                                            alt={game.name}
-                                            className="w-full h-full object-cover"
-                                            onError={(e) => {
-                                                const target = e.target as HTMLImageElement;
-                                                target.style.display = 'none';
-                                                target.nextElementSibling?.classList.remove('hidden');
-                                            }}
-                                        />
-                                        <div className="absolute inset-0 bg-gradient-to-br from-orange-500 to-amber-500 hidden flex items-center justify-center">
-                                            <span className="text-2xl">🎮</span>
+                <>
+                    {filteredOriginalsGames.length === 0 ? (
+                        <div className="text-center py-12">
+                            <div className="text-gray-400 text-6xl mb-4">🎮</div>
+                            <h3 className="text-white text-xl font-bold mb-2">No games found</h3>
+                            <p className="text-gray-400">
+                                No games found matching "{searchQuery}"
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                            {filteredOriginalsGames.map((game) => (
+                                <div
+                                    key={game.id}
+                                    onClick={() => handleGameClick(game.id, 'originals')}
+                                    className="group cursor-pointer transform hover:scale-105 transition-all duration-300"
+                                >
+                                    <div className="bg-gradient-to-br from-orange-500 to-amber-500 rounded-2xl p-1 glow-orange group-hover:glow-gold transition-all duration-300">
+                                        <div className="bg-stake-dark rounded-xl p-3 text-center">
+                                            <div className="rounded-lg mb-2 flex items-center justify-center relative">
+                                                <img
+                                                    src={game.image}
+                                                    alt={game.name}
+                                                    className="w-full h-full object-cover"
+                                                    onError={(e) => {
+                                                        const target = e.target as HTMLImageElement;
+                                                        target.style.display = 'none';
+                                                        target.nextElementSibling?.classList.remove('hidden');
+                                                    }}
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-br from-orange-500 to-amber-500 hidden flex items-center justify-center">
+                                                    <span className="text-2xl">🎮</span>
+                                                </div>
+                                            </div>
+                                            <h3 className="text-white font-bold text-sm mb-1">{game.name}</h3>
+                                            <div className="flex items-center justify-center space-x-1">
+                                                <div className="w-2 h-2 bg-stake-green rounded-full animate-pulse"></div>
+                                                <span className="text-gray-400 text-xs">{game.players}</span>
+                                            </div>
                                         </div>
                                     </div>
-                                    <h3 className="text-white font-bold text-sm mb-1">{game.name}</h3>
-                                    <div className="flex items-center justify-center space-x-1">
-                                        <div className="w-2 h-2 bg-stake-green rounded-full animate-pulse"></div>
-                                        <span className="text-gray-400 text-xs">{game.players}</span>
-                                    </div>
                                 </div>
-                            </div>
+                            ))}
                         </div>
-                    ))}
-                </div>
+                    )}
+                </>
             );
         }
 
-        const games = getGamesByCategory(activeTab);
-
         return (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                {games.map((game) => (
-                    <div
-                        key={game.id}
-                        onClick={() => handleGameClick(game.id, activeTab, game.number)}
-                        className="group cursor-pointer transform hover:scale-105 transition-all duration-300"
-                    >
-                        <div className="bg-gradient-to-br from-orange-500 to-amber-500 rounded-2xl p-1 glow-orange group-hover:glow-gold transition-all duration-300">
-                            <div className="bg-stake-dark rounded-xl p-3 text-center">
-                                <div className="aspect-video rounded-lg mb-2 flex items-center justify-center relative overflow-hidden">
-                                    <img
-                                        src={game.image}
-                                        alt={game.name}
-                                        className="w-full h-full object-cover"
-                                        onError={(e) => {
-                                            const target = e.target as HTMLImageElement;
-                                            target.style.display = 'none';
-                                            target.nextElementSibling?.classList.remove('hidden');
-                                        }}
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-br from-orange-500 to-amber-500 hidden flex items-center justify-center">
-                                        <span className="text-2xl">🎮</span>
+            <>
+                {filteredCategoryGames.length === 0 ? (
+                    <div className="text-center py-12">
+                        <div className="text-gray-400 text-6xl mb-4">🎰</div>
+                        <h3 className="text-white text-xl font-bold mb-2">No games found</h3>
+                        <p className="text-gray-400">
+                            No {activeTab} games found matching "{searchQuery}"
+                        </p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                        {filteredCategoryGames.map((game) => (
+                            <div
+                                key={game.id}
+                                onClick={() => handleGameClick(game.id, activeTab, game.number)}
+                                className="group cursor-pointer transform hover:scale-105 transition-all duration-300"
+                            >
+                                <div className="bg-gradient-to-br from-orange-500 to-amber-500 rounded-2xl p-1 glow-orange group-hover:glow-gold transition-all duration-300">
+                                    <div className="bg-stake-dark rounded-xl p-3 text-center">
+                                        <div className="aspect-video rounded-lg mb-2 flex items-center justify-center relative overflow-hidden">
+                                            <img
+                                                src={game.image}
+                                                alt={game.name}
+                                                className="w-full h-full object-cover"
+                                                onError={(e) => {
+                                                    const target = e.target as HTMLImageElement;
+                                                    target.style.display = 'none';
+                                                    target.nextElementSibling?.classList.remove('hidden');
+                                                }}
+                                            />
+                                            <div className="absolute inset-0 bg-gradient-to-br from-orange-500 to-amber-500 hidden flex items-center justify-center">
+                                                <span className="text-2xl">🎮</span>
+                                            </div>
+                                        </div>
+                                        <h3 className="text-white font-bold text-sm mb-1">{game.name}</h3>
+                                        <div className="text-center mt-1">
+                                            <span className="text-stake-green text-xs font-bold">$1+</span>
+                                        </div>
                                     </div>
                                 </div>
-                                <h3 className="text-white font-bold text-sm mb-1">{game.name}</h3>
-                                <div className="text-center mt-1">
-                                    <span className="text-stake-green text-xs font-bold">$1+</span>
-                                </div>
                             </div>
-                        </div>
+                        ))}
                     </div>
-                ))}
-            </div>
+                )}
+            </>
         );
     };
 
     return (
         <>
+            {/* Search Bar */}
+            <div className="bg-stake-gray border border-stake-border rounded-xl p-4 mb-6">
+                <div className="relative max-w-2xl mx-auto">
+                    <input
+                        type="text"
+                        placeholder="Search games..."
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        className="w-full bg-stake-dark border border-stake-border rounded-xl px-4 py-3 pl-12 pr-10 text-white placeholder-gray-400 focus:outline-none focus:border-stake-orange focus:glow-orange transition-all duration-300"
+                    />
+                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    {searchQuery && (
+                        <button
+                            onClick={clearSearch}
+                            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors duration-200"
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    )}
+                </div>
+            </div>
+
             {/* Tabs Header */}
             <div className="flex items-center justify-between mb-6">
                 {/* Tabs Container with Scroll */}
-                <div className="flex-1 relative min-w-0"> {/* Added min-w-0 to prevent flex overflow */}
-                    {/* Scroll Buttons - Only show on mobile */}
-                    {/*<button*/}
-                    {/*    onClick={scrollLeft}*/}
-                    {/*    className="md:hidden absolute left-0 top-1/2 transform -translate-y-1/2 z-10 w-8 h-8 bg-stake-dark bg-opacity-90 rounded-full flex items-center justify-center text-white hover:bg-opacity-100 transition-all duration-200 shadow-lg border border-stake-border"*/}
-                    {/*>*/}
-                    {/*    ‹*/}
-                    {/*</button>*/}
-
-                    {/*<button*/}
-                    {/*    onClick={scrollRight}*/}
-                    {/*    className="md:hidden absolute right-0 top-1/2 transform -translate-y-1/2 z-10 w-8 h-8 bg-stake-dark bg-opacity-90 rounded-full flex items-center justify-center text-white hover:bg-opacity-100 transition-all duration-200 shadow-lg border border-stake-border"*/}
-                    {/*>*/}
-                    {/*    ›*/}
-                    {/*</button>*/}
-
-                    {/* Scrollable Tabs Container */}
+                <div className="flex-1 relative min-w-0">
                     <div
                         ref={scrollContainerRef}
                         className="flex space-x-1 bg-stake-dark rounded-xl p-1 overflow-x-auto scrollbar-hide md:overflow-visible md:flex-wrap"
@@ -160,7 +221,10 @@ export const GameTabs: React.FC<GameTabsProps> = ({ onGameSelect, userLoggedIn }
                         {categories.map((category) => (
                             <button
                                 key={category.id}
-                                onClick={() => setActiveTab(category.id)}
+                                onClick={() => {
+                                    setActiveTab(category.id);
+                                    setSearchQuery(''); // Clear search when changing tabs
+                                }}
                                 className={`flex-shrink-0 flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 min-w-max ${
                                     activeTab === category.id
                                         ? 'gradient-orange text-white shadow-lg glow-orange'
@@ -183,9 +247,14 @@ export const GameTabs: React.FC<GameTabsProps> = ({ onGameSelect, userLoggedIn }
             {/* Active Tab Content */}
             <div>
                 <div className="flex items-center justify-between mb-4">
-                    <div className="min-w-0 flex-1"> {/* Added to prevent text overflow */}
+                    <div className="min-w-0 flex-1">
                         <h3 className="text-xl font-bold text-white capitalize truncate">
                             {activeTab === 'originals' ? 'JW Originals' : activeTab}
+                            {searchQuery && (
+                                <span className="text-gray-400 text-sm ml-2">
+                                    ({activeTab === 'originals' ? filteredOriginalsGames.length : filteredCategoryGames.length} results)
+                                </span>
+                            )}
                         </h3>
                         <p className="text-stake-light-gray text-sm truncate">
                             {activeTab === 'slots' && 'Spin and win big jackpots'}
@@ -193,6 +262,7 @@ export const GameTabs: React.FC<GameTabsProps> = ({ onGameSelect, userLoggedIn }
                             {activeTab === 'spins' && 'Quick spin games'}
                             {activeTab === 'roulettes' && 'Classic roulette variations'}
                             {activeTab === 'originals' && 'Exclusive JW games'}
+                            {searchQuery && ` • Searching for "${searchQuery}"`}
                         </p>
                     </div>
                     <div className="flex items-center space-x-2 flex-shrink-0 ml-2">

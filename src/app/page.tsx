@@ -16,6 +16,7 @@ import {Plinko} from '@/components/games/Plinko';
 import {Dice} from '@/components/games/Dice';
 import {Mines} from '@/components/games/Mines';
 import {useGameState} from '@/hooks/useGameState';
+import {Footer} from "@/components/layout/Footer";
 // import {getGameImage} from "@/utils/imageutils";
 
 export default function Home() {
@@ -33,6 +34,12 @@ export default function Home() {
     // In your main page, update the handleGameSelect function:
     // Keep your original handleGameSelect function
     const handleGameSelect = (gameId: string, category: string, gameNumber?: number) => {
+        if (gameId === 'home') {
+            setCurrentView('home');
+            setCurrentGame('home');
+            setSidebarOpen(false);
+            return;
+        }
         if (!user.isLoggedIn) {
             setAuthModalOpen(true);
             return;
@@ -279,8 +286,12 @@ export default function Home() {
                     ) : (
                         renderGame()
                     )}
+                    <Footer />
+
                 </main>
+
             </div>
+
         </div>
     );
 }
