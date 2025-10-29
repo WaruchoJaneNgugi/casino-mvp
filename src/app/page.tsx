@@ -26,6 +26,10 @@ export default function Home() {
     const [authModalOpen, setAuthModalOpen] = useState(false);
     const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
 
+    const handleMenuToggle = () => {
+        setSidebarOpen(!sidebarOpen);
+    };
+
     // In your main page, update the handleGameSelect function:
     // Keep your original handleGameSelect function
     const handleGameSelect = (gameId: string, category: string, gameNumber?: number) => {
@@ -111,7 +115,7 @@ export default function Home() {
             <Header
                 user={user}
                 player={player}
-                onMenuToggle={() => setSidebarOpen(!sidebarOpen)}
+                onMenuToggle={handleMenuToggle}
                 onAuthClick={(mode) => {
                     setAuthMode(mode);
                     setAuthModalOpen(true);

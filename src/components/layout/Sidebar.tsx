@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { User, Player } from '@/types';
+import React, {useState} from 'react';
+import {User, Player} from '@/types';
 
 interface SidebarProps {
     isOpen: boolean;
@@ -11,22 +11,22 @@ interface SidebarProps {
 }
 
 const menuItems = [
-    { id: 'home', name: 'Home', icon: '🏠' },
-    { id: 'slots', name: 'Slots', icon: '🎰' },
-    { id: 'live', name: 'Live Casino', icon: '🎥' },
-    { id: 'sports', name: 'Sports', icon: '⚽' },
-    { id: 'originals', name: 'Originals', icon: '⭐' },
-    { id: 'promotions', name: 'Promotions', icon: '🎁' },
-    { id: 'vip', name: 'VIP', icon: '👑' },
+    {id: 'home', name: 'Home', icon: '🏠'},
+    {id: 'slots', name: 'Slots', icon: '🎰'},
+    {id: 'live', name: 'Live Casino', icon: '🎥'},
+    {id: 'sports', name: 'Sports', icon: '⚽'},
+    {id: 'originals', name: 'Originals', icon: '⭐'},
+    {id: 'promotions', name: 'Promotions', icon: '🎁'},
+    {id: 'vip', name: 'VIP', icon: '👑'},
 ];
 
 const originalGames = [
-    { id: 'dice', name: 'Dice', icon: '🎲' },
-    { id: 'mines', name: 'Mines', icon: '💣' },
-    { id: 'crash', name: 'Crash', icon: '🚀' },
-    { id: 'plinko', name: 'Plinko', icon: '🔴' },
-    { id: 'blackjack', name: 'Blackjack', icon: '🃏' },
-    { id: 'roulette', name: 'Roulette', icon: '🎡' },
+    {id: 'dice', name: 'Dice', icon: '🎲'},
+    {id: 'mines', name: 'Mines', icon: '💣'},
+    {id: 'crash', name: 'Crash', icon: '🚀'},
+    {id: 'plinko', name: 'Plinko', icon: '🔴'},
+    {id: 'blackjack', name: 'Blackjack', icon: '🃏'},
+    {id: 'roulette', name: 'Roulette', icon: '🎡'},
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -37,8 +37,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                                     user,
                                                     player
                                                 }) => {
-    const [collapsed, setCollapsed] = useState(false);
-
+    // const [collapsed, setCollapsed] = useState(false);
+    const [collapsed, setCollapsed] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return window.innerWidth >= 1024; // collapsed on desktop by default
+        }
+        return false;
+    });
     const handleMenuClick = (itemId: string) => {
         if (itemId === 'home') {
             onGameSelect('home');
@@ -70,17 +75,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
             {/* Sidebar */}
             <div className={`
-                fixed top-0 left-0 h-full bg-stake-darker/95 backdrop-blur-md border-r border-stake-border z-50 transform transition-all duration-300 ease-in-out
-                ${isOpen ? 'translate-x-0' : '-translate-x-full'} 
-                ${collapsed ? 'w-20' : 'w-64'} 
-                lg:translate-x-0 lg:static lg:z-auto
-            `}>
-                {/* Logo and Collapse Button */}
+    fixed top-0 left-0 h-full bg-stake-darker/95 backdrop-blur-md border-r border-stake-border z-50 transform transition-all duration-300 ease-in-out
+    ${isOpen ? 'translate-x-0' : '-translate-x-full'} 
+    ${collapsed ? 'w-20' : 'w-64'} 
+    lg:fixed lg:translate-x-0 lg:z-50
+`}>
+                {/*Logo and Collapse Button*/}
                 <div className="p-4 border-b border-stake-border">
-                    <div className={`flex items-center justify-between ${collapsed ? 'flex-col space-y-2' : 'space-x-3'}`}>
+                    <div
+                        className={`flex items-center justify-between ${collapsed ? 'flex-col space-y-2' : 'space-x-3'}`}>
                         {!collapsed && (
                             <div className="flex items-center space-x-3">
-                                <div className="w-10 h-10 gradient-orange rounded-lg flex items-center justify-center glow-orange">
+                                <div
+                                    className="w-10 h-10 gradient-orange rounded-lg flex items-center justify-center glow-orange">
                                     <span className="text-white font-bold text-lg">JW</span>
                                 </div>
                                 <div>
@@ -90,7 +97,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             </div>
                         )}
                         {collapsed && (
-                            <div className="w-10 h-10 gradient-orange rounded-lg flex items-center justify-center glow-orange">
+                            <div
+                                className="w-10 h-10 gradient-orange rounded-lg flex items-center justify-center glow-orange">
                                 <span className="text-white font-bold text-lg">JW</span>
                             </div>
                         )}
@@ -136,7 +144,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {/* Stake Originals */}
                 {!collapsed && (
                     <div className="p-4">
-                        <h3 className="text-gray-400 text-sm font-semibold mb-3 uppercase tracking-wider">Stake Originals</h3>
+                        <h3 className="text-gray-400 text-sm font-semibold mb-3 uppercase tracking-wider">Stake
+                            Originals</h3>
                         <div className="space-y-1">
                             {originalGames.map((game) => (
                                 <button
