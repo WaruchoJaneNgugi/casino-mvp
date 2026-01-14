@@ -4,25 +4,20 @@ import React, {useState} from 'react';
 import {Header} from '@/components/layout/Header';
 import {PromotionBanner} from '@/components/layout/PromotionBanner';
 import {Sidebar} from '@/components/layout/Sidebar';
-// import { FeaturedGames } from '@/components/layout/FeaturedGames';
-// import { QuickStats } from '@/components/layout/QuickStats';
 import {AuthModal} from '@/components/auth/AuthModal';
-import {GameTabs} from '@/components/layout/GameTabs'; // Import the new GameTabs
-import {SlotMachine} from '@/components/games/SlotMachine';
-import {Blackjack} from '@/components/games/Blackjack';
-import {Roulette} from '@/components/games/Roulette';
-import {Crash} from '@/components/games/Crash';
-import {Plinko} from '@/components/games/Plinko';
-import {Dice} from '@/components/games/Dice';
-import {Mines} from '@/components/games/Mines';
+import {GameTabs} from '@/components/layout/GameTabs';
 import {useGameState} from '@/hooks/useGameState';
 import {Footer} from "@/components/layout/Footer";
-// import {getGameImage} from "@/utils/imageutils";
+import {getGameComponent, gameConfigs} from '@/utils/gameComponents'; // Import the new system
 
 export default function Home() {
     const {user, player, login, register, logout, deposit} = useGameState();
     const [currentView, setCurrentView] = useState<'home' | 'game'>('home');
-    const [currentGame, setCurrentGame] = useState('home');
+    const [selectedGame, setSelectedGame] = useState<{
+        gameId: string;
+        category: string;
+        gameNumber?: number;
+    } | null>(null);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [authModalOpen, setAuthModalOpen] = useState(false);
     const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
@@ -31,95 +26,88 @@ export default function Home() {
         setSidebarOpen(!sidebarOpen);
     };
 
-    // In your main page, update the handleGameSelect function:
-    // Keep your original handleGameSelect function
+    // Updated handleGameSelect to use the new system
     const handleGameSelect = (gameId: string, category: string, gameNumber?: number) => {
         if (gameId === 'home') {
             setCurrentView('home');
-            setCurrentGame('home');
+            setSelectedGame(null);
             setSidebarOpen(false);
             return;
         }
+
         if (!user.isLoggedIn) {
             setAuthModalOpen(true);
             return;
         }
 
-        // Handle different game categories
-        let actualGameId = gameId;
-
-        if (category === 'slots') {
-            actualGameId = 'slots';
-        } else if (category === 'jackpots') {
-            actualGameId = 'slots';
-        } else if (category === 'spins') {
-            actualGameId = 'slots';
-        } else if (category === 'roulettes') {
-            actualGameId = 'roulette';
-        }
-
-        setCurrentGame(actualGameId);
+        // Set the selected game with all details
+        setSelectedGame({ gameId, category, gameNumber });
         setCurrentView('game');
         setSidebarOpen(false);
     };
 
-// Create wrapper functions for components that don't provide category
+    // Create wrapper functions for components that don't provide category
     const handleGameSelectWithCategory = (gameId: string, category?: string, gameNumber?: number) => {
-        // Provide default category if not specified
         const actualCategory = category || 'originals';
         handleGameSelect(gameId, actualCategory, gameNumber);
     };
 
-    // const handleSimpleGameSelect = (gameId: string) => {
-    //     // For components that only provide gameId, default to 'originals' category
-    //     handleGameSelect(gameId, 'originals');
-    // };
-
     const handleHomeClick = () => {
         setCurrentView('home');
-        setCurrentGame('home');
+        setSelectedGame(null);
     };
 
-    // In your main page, update the handleAuth function:
-    const handleAuth = (phone: string, password: string, name?: string) => { // Changed from email to phone
+    const handleAuth = (phone: string, password: string, name?: string) => {
         if (authMode === 'login') {
-            login(phone, password); // Pass phone instead of email
+            login(phone, password);
         } else {
-            register(phone, password, name || `User${phone.slice(-4)}`); // Pass phone instead of email
+            register(phone, password, name || `User${phone.slice(-4)}`);
         }
         setAuthModalOpen(false);
     };
+
     const handleDeposit = (amount: number) => {
         if (user.isLoggedIn) {
             deposit(amount);
         }
     };
 
-    const renderGame = () => {
-        switch (currentGame) {
-            case 'slots':
-                return <SlotMachine/>;
-            case 'blackjack':
-                return <Blackjack/>;
-            case 'roulette':
-                return <Roulette/>;
-            case 'crash':
-                return <Crash/>;
-            case 'plinko':
-                return <Plinko/>;
-            case 'dice':
-                return <Dice/>;
-            case 'mines':
-                return <Mines/>;
-            default:
-                return null;
+    // New renderGame function using the component registry
+    const renderGameComponent = () => {
+        if (!selectedGame) return null;
+
+        const GameComponent = getGameComponent(selectedGame.gameId);
+        if (GameComponent) {
+            // Pass configuration to the game component if it exists
+            const gameConfig = gameConfigs[selectedGame.gameId];
+            return (
+                <div className="w-full">
+                    <GameComponent
+                        config={gameConfig}
+                        gameData={selectedGame}
+                    />
+                </div>
+            );
         }
+
+        // Fallback for games without specific components
+        return (
+            <div className="text-white p-8 text-center">
+                <div className="bg-stake-dark rounded-2xl p-8 max-w-md mx-auto">
+                    <div className="text-6xl mb-4">🎮</div>
+                    <h3 className="text-xl font-bold mb-2">Game: {selectedGame.gameId}</h3>
+                    <p className="text-gray-400 mb-4">Category: {selectedGame.category}</p>
+                    {selectedGame.gameNumber && (
+                        <p className="text-gray-400 mb-4">Game Number: {selectedGame.gameNumber}</p>
+                    )}
+                    <p className="text-stake-orange">Game component coming soon!</p>
+                </div>
+            </div>
+        );
     };
 
     return (
         <div className="main-entry-div">
-
-
             <div className="main-cont min-h-screen gradient-bg">
                 {/* Header */}
                 <Header
@@ -140,8 +128,8 @@ export default function Home() {
                 <Sidebar
                     isOpen={sidebarOpen}
                     onClose={() => setSidebarOpen(false)}
-                    currentGame={currentGame}
-                    onGameSelect={handleGameSelectWithCategory} // Use the wrapper
+                    currentGame={selectedGame?.gameId || 'home'}
+                    onGameSelect={handleGameSelectWithCategory}
                     user={user}
                     player={player}
                 />
@@ -284,14 +272,11 @@ export default function Home() {
                             </div>
                         </div>
                     ) : (
-                        renderGame()
+                        renderGameComponent()
                     )}
                     <Footer />
-
                 </main>
-
             </div>
-
         </div>
     );
 }

@@ -1,14 +1,14 @@
-import React, { useState, useCallback } from 'react';
+import {useState, useCallback, FC} from 'react';
 import { SlotMachineState, SlotResult } from '@/types';
 import { useGameState } from '@/hooks/useGameState';
 import { Button } from '../common/Button';
 import { BetControls } from '../common/BetControls';
 import { getRandomInt, sleep } from '@/utils/gameUtils';
 
-const SYMBOLS = ['🍒', '🍋', '🍊', '🍇', '🔔', '💎', '7️⃣'];
+// const SYMBOLS = ['🍒', '🍋', '🍊', '🍇', '🔔', '💎', '7️⃣'];
 const STAKE_SYMBOLS = ['⭐', '🔥', '💎', '🎯', '🚀', '👑', '💰'];
 
-export const SlotMachine: React.FC = () => {
+export const SlotMachine: FC = () => {
     const { gameState, updateBalance, placeBet } = useGameState();
     const [slotState, setSlotState] = useState<SlotMachineState>({
         reels: Array(5).fill(null).map(() => Array(3).fill(STAKE_SYMBOLS[0])),
