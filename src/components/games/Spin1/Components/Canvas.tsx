@@ -1,8 +1,8 @@
 import {useRef, useEffect, type FC, useCallback} from "react";
 import type {ColorBlock} from "../Utils/types.ts";
-import {initialColors, usePrevious} from "../Hooks/useColors.ts";
 import PointerImg from "../assets/img/scene/pointer-spin2.png"
 import logoImg from "../assets/img/scene/wheelofoddslogo.png"
+import {initialColors} from "@/components/games/Spin1/Hooks/useColors";
 interface CanvasProps {
     spinState: boolean;
     OnSetWinner:(w:ColorBlock)=>void;
