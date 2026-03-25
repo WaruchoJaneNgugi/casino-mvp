@@ -1,5 +1,5 @@
 import React from 'react';
-import { getGameImage } from '@/utils/imageutils'; // Adjust the path as needed
+import { gameImages } from '@/utils/imageutils';
 
 interface GameGridProps {
     onGameSelect: (gameId: string) => void;
@@ -52,7 +52,7 @@ const featuredGames = [
 export const GameGrid: React.FC<GameGridProps> = ({ onGameSelect, userLoggedIn }) => {
     const handleGameClick = (gameId: string) => {
         if (!userLoggedIn) {
-            alert('Please login to play games!');
+            onGameSelect('__auth__');
             return;
         }
         onGameSelect(gameId);
@@ -73,7 +73,7 @@ export const GameGrid: React.FC<GameGridProps> = ({ onGameSelect, userLoggedIn }
                                     {/* Use getGameImage for the game image */}
                                     <div
                                         className="w-full h-32 rounded-lg bg-cover bg-center mb-3 flex items-center justify-center relative overflow-hidden"
-                                        style={{ backgroundImage: `url('${getGameImage(game.id)}')` }}
+                                        style={{ backgroundImage: `url('${gameImages[game.id as keyof typeof gameImages] as string}')` }}
                                     >
                                         <div className="absolute inset-0 bg-black/40"></div>
                                         <span className="text-2xl relative z-10">{game.icon}</span>

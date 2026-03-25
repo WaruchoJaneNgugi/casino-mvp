@@ -13,140 +13,103 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({
-                                                  user,
-                                                  player,
-                                                  onMenuToggle,
-                                                  onAuthClick,
-                                                  onLogout,
-                                                  onDeposit,
-                                                  currentView,
-                                                  onHomeClick,
-                                              }) => {
-    const [showDepositMenu, setShowDepositMenu] = useState(false);
+    user, player, onMenuToggle, onAuthClick, onLogout, onDeposit, onHomeClick,
+}) => {
+    const [showDeposit, setShowDeposit] = useState(false);
     const depositOptions = [10, 50, 100, 500, 1000];
 
     return (
-        <header className="fixed top-0 left-0 right-0 bg-stake-darker/95 backdrop-blur-md border-b border-stake-border z-50 lg:left-20 transition-all duration-300">
-            <div className="flex items-center justify-between h-16 px-4">
-                {/* Left Section - Menu Button and Logo */}
-                <div className="flex items-center space-x-4">
+        <header className="fixed top-0 left-0 right-0 z-50 border-b border-[var(--border)] bg-[var(--bg-secondary)]/95 backdrop-blur-md lg:left-20 transition-all duration-300">
+            <div className="flex items-center justify-between h-14 px-4 gap-3">
+                {/* Left */}
+                <div className="flex items-center gap-3">
                     <button
                         onClick={onMenuToggle}
-                        className="w-10 h-10 flex items-center justify-center text-white hover:bg-stake-gray rounded-xl transition-colors"
+                        className="w-9 h-9 flex items-center justify-center text-[var(--text-secondary)] hover:text-white hover:bg-[var(--bg-card)] rounded-lg transition-colors"
                     >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                     </button>
-
-                    {/* Logo */}
-                    <div
-                        onClick={onHomeClick}
-                        className="flex items-center space-x-3 cursor-pointer transform hover:scale-105 transition-transform"
-                    >
-                        <div className="w-10 h-10 gradient-orange rounded-xl flex items-center justify-center glow-orange">
-                            <span className="text-white font-bold text-lg">JW</span>
+                    <button onClick={onHomeClick} className="flex items-center gap-2 group">
+                        <div className="w-8 h-8 gradient-orange rounded-lg flex items-center justify-center glow-orange">
+                            <span className="text-white font-bold text-sm">JW</span>
                         </div>
-                        <h1 className="text-xl font-bold gradient-text hidden sm:block">JW Gaming</h1>
-                    </div>
+                        <span className="text-white font-bold text-base hidden sm:block gradient-text">JW Gaming</span>
+                    </button>
                 </div>
 
-                {/* Center Section - Balance (Mobile) */}
-                {user.isLoggedIn && (
-                    <div className="flex-1 flex justify-center lg:hidden max-w-xs">
-                        <div className="bg-stake-gray rounded-xl px-4 py-2 border border-stake-border glow-orange">
-                            <div className="text-xs text-gray-400 text-center">BALANCE</div>
-                            <div className="text-stake-green font-bold">${player.balance.toLocaleString()}</div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Right Section - Auth/Profile */}
-                <div className="flex items-center space-x-3">
-                    {/* Balance and Deposit (Desktop) */}
+                {/* Right */}
+                <div className="flex items-center gap-2">
                     {user.isLoggedIn ? (
                         <>
-                            <div className="hidden lg:flex items-center space-x-4">
-                                {/* Balance */}
-                                <div className="bg-stake-gray rounded-xl px-4 py-2 border border-stake-border glow-orange">
-                                    <div className="text-xs text-gray-400">BALANCE</div>
-                                    <div className="text-stake-green font-bold">${player.balance.toLocaleString()}</div>
-                                </div>
-
-                                {/* Deposit Button */}
-                                <div className="relative">
-                                    <button
-                                        onClick={() => setShowDepositMenu(!showDepositMenu)}
-                                        className="gradient-orange text-white px-4 py-2 rounded-xl font-bold hover-glow transition-all"
-                                    >
-                                        Deposit
-                                    </button>
-
-                                    {/* Deposit Dropdown */}
-                                    {showDepositMenu && (
-                                        <div className="absolute top-full right-0 mt-2 w-48 bg-stake-dark border border-stake-border rounded-xl shadow-2xl z-50">
-                                            <div className="p-3 border-b border-stake-border">
-                                                <div className="text-white font-bold text-sm">Quick Deposit</div>
-                                            </div>
-                                            <div className="p-2 space-y-2">
-                                                {depositOptions.map(amount => (
-                                                    <button
-                                                        key={amount}
-                                                        onClick={() => {
-                                                            onDeposit(amount);
-                                                            setShowDepositMenu(false);
-                                                        }}
-                                                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-stake-gray transition-colors text-white text-sm"
-                                                    >
-                                                        Deposit ${amount}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
+                            {/* Balance */}
+                            <div className="hidden sm:flex flex-col items-end bg-[var(--bg-card)] border border-[var(--border)] rounded-lg px-3 py-1.5">
+                                <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">Balance</span>
+                                <span className="text-[var(--green)] font-bold text-sm leading-none">KSh {player.balance.toLocaleString()}</span>
                             </div>
 
-                            {/* Profile */}
-                            <div className="flex items-center space-x-3">
-                                <div className="text-right hidden sm:block">
-                                    <div className="text-white font-medium text-sm">{user.name}</div>
-                                    <div className="text-stake-green text-xs">ID: {user.id}</div>
-                                </div>
-                                <div className="relative group">
-                                    <div className="w-10 h-10 gradient-orange rounded-full flex items-center justify-center border-2 border-stake-orange-dark cursor-pointer">
-                                        <span className="text-white font-bold text-sm">{user.name.charAt(0).toUpperCase()}</span>
-                                    </div>
-                                    {/* Profile Dropdown */}
-                                    <div className="absolute top-full right-0 mt-2 w-48 bg-stake-dark border border-stake-border rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-                                        <div className="p-4 border-b border-stake-border">
-                                            <div className="text-white font-bold">{user.name}</div>
-                                            <div className="text-stake-green text-sm">${player.balance.toLocaleString()}</div>
+                            {/* Mobile balance */}
+                            <div className="sm:hidden bg-[var(--bg-card)] border border-[var(--border)] rounded-lg px-2 py-1">
+                                <span className="text-[var(--green)] font-bold text-xs">KSh {player.balance.toLocaleString()}</span>
+                            </div>
+
+                            {/* Deposit */}
+                            <div className="relative">
+                                <button
+                                    onClick={() => setShowDeposit(!showDeposit)}
+                                    className="gradient-orange text-white px-3 py-2 rounded-lg font-semibold text-sm hover-glow transition-all"
+                                >
+                                    + Deposit
+                                </button>
+                                {showDeposit && (
+                                    <div className="absolute top-full right-0 mt-2 w-44 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl shadow-2xl z-50 overflow-hidden">
+                                        <div className="px-3 py-2 border-b border-[var(--border)]">
+                                            <span className="text-white font-semibold text-xs uppercase tracking-wider">Quick Deposit</span>
                                         </div>
-                                        <div className="p-2">
+                                        {depositOptions.map(amount => (
                                             <button
-                                                onClick={onLogout}
-                                                className="w-full text-left px-3 py-2 rounded-lg hover:bg-stake-red hover:text-white transition-colors text-gray-300 text-sm"
+                                                key={amount}
+                                                onClick={() => { onDeposit(amount); setShowDeposit(false); }}
+                                                className="w-full text-left px-3 py-2 text-sm text-[var(--text-secondary)] hover:text-white hover:bg-[var(--bg-elevated)] transition-colors"
                                             >
-                                                Logout
+                                                KSh {amount.toLocaleString()}
                                             </button>
-                                        </div>
+                                        ))}
                                     </div>
+                                )}
+                            </div>
+
+                            {/* Avatar */}
+                            <div className="relative group">
+                                <div className="w-8 h-8 gradient-orange rounded-full flex items-center justify-center cursor-pointer border border-[var(--accent-dark)]">
+                                    <span className="text-white font-bold text-xs">{user.name.charAt(0).toUpperCase()}</span>
+                                </div>
+                                <div className="absolute top-full right-0 mt-2 w-44 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden">
+                                    <div className="px-3 py-3 border-b border-[var(--border)]">
+                                        <div className="text-white font-semibold text-sm">{user.name}</div>
+                                        <div className="text-[var(--green)] text-xs">KSh {player.balance.toLocaleString()}</div>
+                                    </div>
+                                    <button
+                                        onClick={onLogout}
+                                        className="w-full text-left px-3 py-2 text-sm text-[var(--text-secondary)] hover:text-[var(--red)] hover:bg-[var(--bg-elevated)] transition-colors"
+                                    >
+                                        Sign Out
+                                    </button>
                                 </div>
                             </div>
                         </>
                     ) : (
-                        /* Auth Buttons */
-                        <div className="flex items-center space-x-3">
+                        <div className="flex items-center gap-2">
                             <button
                                 onClick={() => onAuthClick('login')}
-                                className="text-white hover:text-stake-orange transition-colors font-medium"
+                                className="text-[var(--text-secondary)] hover:text-white transition-colors font-medium text-sm px-3 py-2"
                             >
                                 Sign In
                             </button>
                             <button
                                 onClick={() => onAuthClick('register')}
-                                className="gradient-orange text-white px-4 py-2 rounded-xl font-bold hover-glow transition-all"
+                                className="gradient-orange text-white px-4 py-2 rounded-lg font-semibold text-sm hover-glow transition-all"
                             >
                                 Register
                             </button>

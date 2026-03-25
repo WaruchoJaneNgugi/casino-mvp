@@ -1,6 +1,6 @@
 import React from 'react';
 import {Dice} from "@/components/games/Dice";
-import {SpinWheel} from "@/components/games/SpinWheel";
+import {MainSpinGameArea} from "@/components/games/Spin1/Components/MainSpinGameArea";
 import {Mines} from "@/components/games/Mines";
 import {SlotMachine} from "@/components/games/SlotMachine";
 import {Crash} from "@/components/games/Crash";
@@ -24,7 +24,7 @@ export const gameComponents: { [key: string]: React.ComponentType<any> } = {
     'plinko': Plinko,
     'blackjack': Blackjack,
     'roulette': Roulette,
-    'spins1': SpinWheel,
+    'spins1': MainSpinGameArea,
     // 'spins2': GenericSpin2,
     // 'spins3': GenericSpin3,
     'slot1': SlotMachine,

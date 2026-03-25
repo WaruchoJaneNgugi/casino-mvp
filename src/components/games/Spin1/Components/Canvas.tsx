@@ -1,14 +1,19 @@
 import {useRef, useEffect, type FC, useCallback} from "react";
 import type {ColorBlock} from "../Utils/types.ts";
-import PointerImg from "../assets/img/scene/pointer-spin2.png"
-import logoImg from "../assets/img/scene/wheelofoddslogo.png"
-import {initialColors} from "@/components/games/Spin1/Hooks/useColors";
+import {initialColors, usePrevious} from "../Hooks/useColors.ts";
+import PointerImgSrc from "../assets/img/scene/pointer-spin2.png";
+import logoImgSrc from "../assets/img/scene/wheelofoddslogo.png";
+
+const PointerImg = typeof PointerImgSrc === 'string' ? PointerImgSrc : (PointerImgSrc as { src: string }).src;
+const logoImg = typeof logoImgSrc === 'string' ? logoImgSrc : (logoImgSrc as { src: string }).src;
+import {ColorKey} from "./ColorKey.tsx";
+
 interface CanvasProps {
     spinState: boolean;
-    OnSetWinner:(w:ColorBlock)=>void;
+    OnSetWinner: (w: ColorBlock) => void;
 }
 
-export const Canvas: FC<CanvasProps> = ({spinState,OnSetWinner}) => {
+export const Canvas: FC<CanvasProps> = ({spinState, OnSetWinner}) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const offsetRef = useRef(0); // rotation offset
     const logo = useRef<HTMLImageElement | null>(null);
@@ -56,15 +61,49 @@ export const Canvas: FC<CanvasProps> = ({spinState,OnSetWinner}) => {
             ctx.closePath();
 
             // 🎨 check if this slice is orange → use gradient
-            if (block.hex === "gradient-orange") {
+            if (block.hex === "#1a1f2e") {
                 const grad = ctx.createRadialGradient(
                     centerX, centerY, 0,       // inner circle (center, radius 0)
                     centerX, centerY, radius   // outer circle (center, radius = wheel size)
                 );
 
-                grad.addColorStop(0, "rgb(230,112,34)"); // inner (darker orange)
-                grad.addColorStop(0.25, "rgb(241,184,57)"); // inner (darker orange)
-                grad.addColorStop(1, "rgb(230,112,34)"); // outer (lighter golden)
+                grad.addColorStop(0, "rgba(68,18,47,0.2)"); // inner
+                grad.addColorStop(1, "#1a1f2e"); // outer
+
+                ctx.fillStyle = grad;
+
+            }
+            else if (block.hex === "#8B0000") {
+                const grad = ctx.createRadialGradient(
+                    centerX, centerY, 0,       // inner circle (center, radius 0)
+                    centerX, centerY, radius   // outer circle (center, radius = wheel size)
+                );
+
+                grad.addColorStop(0, "rgba(68,18,47,0.2)"); // inner
+                grad.addColorStop(1, "#cc0404"); // outer
+
+                ctx.fillStyle = grad;
+
+            } else if (block.hex === "#ffd60a") {
+                const grad = ctx.createRadialGradient(
+                    centerX, centerY, 0,       // inner circle (center, radius 0)
+                    centerX, centerY, radius   // outer circle (center, radius = wheel size)
+                );
+
+                grad.addColorStop(0, "rgba(68,18,47,0.2)"); // inner
+                grad.addColorStop(1, "#ffd60a"); // outer
+
+                ctx.fillStyle = grad;
+
+            }
+            else if (block.hex === "rgb(6,0,148)") {
+                const grad = ctx.createRadialGradient(
+                    centerX, centerY, 0,       // inner circle (center, radius 0)
+                    centerX, centerY, radius   // outer circle (center, radius = wheel size)
+                );
+
+                grad.addColorStop(0, "rgba(68,18,47,0.2)"); // inner
+                grad.addColorStop(1, "rgb(6,0,148)"); // outer
 
                 ctx.fillStyle = grad;
 
@@ -75,9 +114,10 @@ export const Canvas: FC<CanvasProps> = ({spinState,OnSetWinner}) => {
                     centerX, centerY, 0,           // inner circle (center, radius 0)
                     centerX, centerY, radius       // outer circle (center, radius = wheel radius)
                 );
+                grad.addColorStop(0, "rgb(230,112,34)"); // inner (darker orange)
+                grad.addColorStop(0.25, "rgb(241,184,57)"); // inner (darker orange)
+                grad.addColorStop(1, "rgb(230,112,34)"); // outer (lighter golden)
 
-                grad.addColorStop(0, "rgba(68,18,47,0.2)"); // inner
-                grad.addColorStop(1, "rgb(90,32,65)"); // outer
 
                 ctx.fillStyle = grad;
             }
@@ -89,26 +129,35 @@ export const Canvas: FC<CanvasProps> = ({spinState,OnSetWinner}) => {
             ctx.rotate(startAngle + sliceAngle / 2);
 
             // ✅ If purple background → make text white, else black
-            if (block.hex === "rgb(90,32,67)") {
-                ctx.fillStyle = "#fff";
-            } else {
-                ctx.fillStyle = "#000";
-            }
+            // if (block.hex === "rgb(241,184,57)") {
+            //     ctx.fillStyle = "#fff";
+            // } else {
+            //     ctx.fillStyle = "#000";
+            // }
+            const text = block.name;
 
-            ctx.font = "bold 35px Arial";
+            ctx.font = "bold 25px Arial";
             ctx.fillStyle = "#fff";
             ctx.strokeStyle = "#000";
-            ctx.lineWidth = 5;
+            ctx.lineWidth = 3;
 
-            const text = block.name;
             // adjust y position
-            ctx.strokeText(text,radius * 0.75, 0);
-            ctx.fillText(text,radius * 0.74, 0);
+            ctx.strokeText(text, radius * 0.83, 0);
+            ctx.fillText(text, radius * 0.83, 0);
+
 
             // ctx.fillText(block.name, radius * 0.7, 0);
             ctx.restore();
 
         });
+        ctx.shadowColor = "rgba(0,0,0,0.27)";
+        ctx.shadowBlur = 20;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 15;
+
+// Draw the shadow (fill with very light color)
+        ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+        ctx.fill();
 /// 🎨 Gradient border for the wheel
         ctx.save();
         ctx.beginPath();
@@ -116,11 +165,11 @@ export const Canvas: FC<CanvasProps> = ({spinState,OnSetWinner}) => {
 
 // create linear gradient for stroke
         const gradient = ctx.createLinearGradient(centerX - radius, centerY, centerX + radius, centerY);
-        gradient.addColorStop(0, "rgb(90,32,67)");   // light gold
-        gradient.addColorStop(0.25, "rgb(47,4,30)");
-        gradient.addColorStop(0.5, "rgb(90,32,67)");
-        gradient.addColorStop(0.75, "rgb(47,4,30)");
-        gradient.addColorStop(1, "rgb(90,32,67)");
+        gradient.addColorStop(0, "#1a1f2e");   // light gold
+        gradient.addColorStop(0.25, "#1a1f2e");
+        gradient.addColorStop(0.5, "#1a1f2e");
+        gradient.addColorStop(0.75, "#1a1f2e");
+        gradient.addColorStop(1, "#1a1f2e");
 
         ctx.lineWidth = 20;
         ctx.strokeStyle = gradient;
@@ -144,7 +193,28 @@ export const Canvas: FC<CanvasProps> = ({spinState,OnSetWinner}) => {
         ctx.fillRect(centerX - radius, centerY - radius, radius * 2, radius * 2);
 
         ctx.restore();
+        ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
+        ctx.shadowBlur = 20;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 15;
 
+// Draw the shadow (fill with very light color)
+        ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+        ctx.fill();
+
+// Add a subtle inner glow at the edges
+        const edgeGlow = ctx.createRadialGradient(
+            centerX, centerY, radius - 10,
+            centerX, centerY, radius + 10
+        );
+        edgeGlow.addColorStop(0, "rgba(0,0,0,0.1)");
+        edgeGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
+
+        ctx.strokeStyle = edgeGlow;
+        ctx.lineWidth = 30;
+        ctx.stroke();
+
+        ctx.restore();
 
         if (pointer.current) {
             const pointerWidth = 90;
@@ -160,23 +230,34 @@ export const Canvas: FC<CanvasProps> = ({spinState,OnSetWinner}) => {
         // === 🎨 Center Circle with Gradient + Outer + Inner Shadow ===
         ctx.save();
         ctx.beginPath();
-        ctx.arc(centerX, centerY, 120, 0, Math.PI * 2);
+        ctx.arc(centerX, centerY, 300, 0, Math.PI * 2);
 
 // linear gradient for the circle fill
         const centerGradient = ctx.createRadialGradient(
-            centerX, centerY, 0,        // inner circle (at center, radius 0)
+            centerX, centerY, 150,        // inner circle (at center, radius 0)
+            centerX, centerY, 50        // outer circle (at center, radius 60)
+        );
+        const centerBGradient = ctx.createRadialGradient(
+            centerX, centerY, 250,        // inner circle (at center, radius 0)
             centerX, centerY, 80        // outer circle (at center, radius 60)
         );
 
-// add color stops
-        centerGradient.addColorStop(0, "rgb(65,0,30)");   // light gold
-        centerGradient.addColorStop(0.25, "rgb(28,12,22)");
-        centerGradient.addColorStop(0.5, "rgb(65,0,30)");
-        centerGradient.addColorStop(0.75, "rgb(65,0,30)");
-        centerGradient.addColorStop(1, "rgb(65,0,30)");
+
+        centerGradient.addColorStop(0, "#1a1f2e");   // light gold
+        centerGradient.addColorStop(0.25, "#1a1f2e");
+        centerGradient.addColorStop(0.5, "#1a1f2e");
+        centerGradient.addColorStop(0.75, "#1a1f2e");
+        centerGradient.addColorStop(1, "#1a1f2e");
 // fill with gradient
         ctx.fillStyle = centerGradient;
-
+        // / add color stops
+        centerBGradient.addColorStop(0, "#1a1f2e");   // light gold
+        centerBGradient.addColorStop(0.25, "#020918");
+        centerBGradient.addColorStop(0.5, "#1a1f2e");
+        centerBGradient.addColorStop(0.75, "#1a1f2e");
+        centerBGradient.addColorStop(1, "#1a1f2e");
+// fill with gradient
+        ctx.fillStyle = centerBGradient
 // ✅ Outer shadow
         ctx.shadowColor = "rgb(0,0,0)";
         ctx.shadowBlur = 20;
@@ -200,44 +281,13 @@ export const Canvas: FC<CanvasProps> = ({spinState,OnSetWinner}) => {
         innerShadow.addColorStop(1, "rgba(57,0,65,0.35)"); // edge dark
 
         ctx.fillStyle = innerShadow;
-        ctx.fillRect(centerX - 60, centerY - 60, 120, 120);
+        ctx.fillRect(centerX + 100, centerY + 100, 120, 120);
         ctx.restore();
 
-        //
-        // ctx.stroke();
-        // ctx.restore();
-//         if (winner) {
-//             ctx.fillStyle = "rgb(47,4,30)";   // inside color
-//             ctx.font = "bold 90px Arial";     // bold + big font
-//             ctx.textAlign = "center";
-//             ctx.textBaseline = "middle";
-//
-//             ctx.strokeStyle = "#fffefe";      // outline color (black)
-//             ctx.lineWidth = 4;                // outline thickness
-//
-// // Draw outline first
-//             ctx.strokeText(winner.name, centerX, centerY);
-//
-// // Draw filled text on top
-//             ctx.fillText(winner.name, centerX, centerY);
-//
-//
-//         } else {
-//
-//             ctx.fillStyle = "rgb(47,4,30)";   // inside color
-//             ctx.font = "bold 100px Arial";     // bold + big font
-//             ctx.textAlign = "center";
-//             ctx.textBaseline = "middle";
-//
-//             ctx.strokeStyle = "#fffefe";      // outline color (black)
-//             ctx.lineWidth = 4;                // outline thickness
-//             ctx.strokeText("..", centerX, centerY);
-//             ctx.fillText("..", centerX, centerY);
-//             // ctx.fillText("..", centerX, centerY);
-//         }
-        // === 🎨 Draw Logo in Center ===
+
+
         if (logo.current) {
-            const logoSize = 260; // adjust size as needed
+            const logoSize = 360; // adjust size as needed
             const logoX = centerX - logoSize / 2;
             const logoY = centerY - logoSize / 2;
 
@@ -255,6 +305,7 @@ export const Canvas: FC<CanvasProps> = ({spinState,OnSetWinner}) => {
 
             ctx.restore();
         }
+
 
 
         // After drawing the wheel
@@ -333,6 +384,10 @@ export const Canvas: FC<CanvasProps> = ({spinState,OnSetWinner}) => {
 
         requestAnimationFrame(animate);
     }, [spinState, drawWheel, prevSpin, OnSetWinner]);
-
-    return <canvas ref={canvasRef} width={820} height={820}/>;
+    return (
+        <div className="canvas-container" style={{position: 'relative', display: 'flex',flexDirection:"column"}}>
+            <canvas ref={canvasRef} width={860} height={820}/>
+            <ColorKey/>
+        </div>
+    );
 };
